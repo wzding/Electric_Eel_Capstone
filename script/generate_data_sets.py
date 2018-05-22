@@ -75,7 +75,7 @@ def load_image_into_numpy_array(image):
         (im_height, im_width, 3)).astype(np.uint8)
 
 # What model to download.
-MODEL_NAME = 'faster_rcnn_resnet101_coco_11_06_2017'
+MODEL_NAME = 'faster_rcnn_inception_resnet_v2_atrous_coco_2018_01_28'
 MODEL_FILE = MODEL_NAME + '.tar.gz'
 DOWNLOAD_BASE = 'http://download.tensorflow.org/models/object_detection/'
 
@@ -84,11 +84,11 @@ DOWNLOAD_BASE = 'http://download.tensorflow.org/models/object_detection/'
 PATH_TO_CKPT = MODEL_NAME + '/frozen_inference_graph.pb'
 
 # List of the strings that is used to add correct label for each box.
-PATH_TO_PRETRAIN_LABELS = './models/object_detection/data/mscoco_label_map.pbtxt'
+PATH_TO_PRETRAIN_LABELS = './research/object_detection/data/mscoco_label_map.pbtxt'
 NUM_CLASSES = 90
 TRAFFIC_LIGHT_CLASS = 10
 THRESHOLD = 0.89
-PATH_TO_NEW_LABLES = './tl_label_map.pbtxt'
+PATH_TO_NEW_LABLES = './research/object_detection/data/sdc_label_map.pbtxt'
 
 # already load pre-train model and weights?
 if not os.path.exists('faster_rcnn_resnet101_coco_11_06_2017/model.ckpt.index'):
@@ -122,7 +122,7 @@ if __name__ == '__main__':
     parser.add_argument('--infilename', type=str, default='loop_with_traffic_light.csv', help='traffic light csv input file')
     parser.add_argument('--outfilename', type=str, default=defaultOutput, help='TFRecord file')
     args = parser.parse_args()
-    incsv = os.getcwd()+'/../../test_images/'+args.infilename
+    incsv = os.getcwd()+'data/'+args.infilename
 
     # read in incsv file
     imagefiles = []
@@ -132,7 +132,7 @@ if __name__ == '__main__':
         for line in f:
             if count > 0:
                 data = line.split(',')
-                imagefiles.append(os.getcwd()+'/../../'+data[7].replace("'", ""))
+                imagefiles.append(os.getcwd()+data[7].replace("'", ""))
                 newlabels.append(int(data[8]))
             count += 1
 
@@ -172,4 +172,3 @@ if __name__ == '__main__':
                                 record = create_record(boxes[j], newlabels[i], image_np, imagefiles[i])
                                 writer.write(record.SerializeToString())
     writer.close()
-
