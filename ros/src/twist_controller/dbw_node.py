@@ -32,16 +32,6 @@ that we have created in the `__init__` function.
 
 '''
 
-unpack_twist_vec = attrgetter('x', 'y', 'z')
-
-
-def unpack_twist_message(message):
-    return (
-        unpack_twist_vec(message.twist.linear),
-        unpack_twist_vec(message.twist.angular)
-    )
-
-
 class DBWNode(object):
     def __init__(self):
         rospy.init_node('dbw_node')
@@ -64,43 +54,50 @@ class DBWNode(object):
         self.brake_pub = rospy.Publisher('/vehicle/brake_cmd',
                                          BrakeCmd, queue_size=1)
 
-        min_speed = 0.1
+        # DONE: Create `Controller` object
+        self.controller = Controller(vehicle_mass=vehicle_mass,
+                                     fuel_capacity=fuel_capacity,
+                                     brake_deadband=brake_deadband,
+                                     decel_limit=decel_limit,
+                                     accel_limit=accel_limit,
+                                     wheel_radius=wheel_radius,
+                                     wheel_base=wheel_base,
+                                     steer_ratio=steer_ratio,
+                                     max_lat_accel=max_lat_accel,
+                                     max_steer_angle=max_steer_angle)
 
-        # TODO: Create `Controller` object
-        self.controller = Controller(
-            wheel_base, steer_ratio, min_speed, max_lat_accel,
-            max_steer_angle
-        )
-
-        # TODO: Subscribe to all the topics you need to
+        # DONE: Subscribe to all the topics you need to
         rospy.Subscriber('/vehicle/dbw_enabled', Bool, self.dbw_enabled_cb)
-        rospy.Subscriber('/current_velocity', TwistStamped,
-                         self.velocity_actual_cb)
-        rospy.Subscriber('/twist_cmd', TwistStamped,
-                         self.twist_cmd_cb)
+        rospy.Subscriber('/twist_cmd', TwistStamped, self.twist_cb)
+        rospy.Subscriber('/current_velocity', TwistStamped, self.velocity_cb)
 
-        self.dbw_enabled = True
-        self.v_target = (0.0, 0.0, 0.0)
-        self.omega_target = (0.0, 0.0, 0.0)
-        self.v_actual = (0.0, 0.0, 0.0)
-        self.omega_actual = (0.0, 0.0, 0.0)
+        # self.dbw_enabled = True
+        # self.v_target = (0.0, 0.0, 0.0)
+        # self.omega_target = (0.0, 0.0, 0.0)
+        # self.v_actual = (0.0, 0.0, 0.0)
+        # self.omega_actual = (0.0, 0.0, 0.0)
+        self.current_vel = None
+        self.current_ang_vel = None
+        self.dbw_enabled = None
+        self.linear_vel = None
+        self.angular_vel = None
+        self.throttle = self.steering = self.brake = 0
 
         self.loop()
 
     def loop(self):
         rate = rospy.Rate(50)  # 50Hz
         while not rospy.is_shutdown():
-            # TODO: Get predicted throttle, brake, and steering using `twist_controller`
+            # DONE: Get predicted throttle, brake, and steering using `twist_controller`
             # You should only publish the control commands if dbw is enabled
-            throttle, brake, steering = self.controller.control(
-                self.dbw_enabled,
-                self.v_actual,
-                self.v_target,
-                self.omega_actual,
-                self.omega_target
-            )
+            if not None in (self.current_vel, self.linear_vel, self.angular_vel):
+                self.throttle, self.brake, self.steering = self.controller.control(
+                    self.current_vel,
+                    self.dbw_enabled,
+                    self.linear_vel,
+                    self.angular_vel)
             if self.dbw_enabled:
-                self.publish(throttle, brake, steering)
+                self.publish(self.throttle, self.brake, self.steering)
             rate.sleep()
 
     def publish(self, throttle, brake, steer):
@@ -121,14 +118,15 @@ class DBWNode(object):
         bcmd.pedal_cmd = brake
         self.brake_pub.publish(bcmd)
 
-    def dbw_enabled_cb(self, message):
-        self.dbw_enabled = message.data
+    def dbw_enabled_cb(self, msg):
+        self.dbw_enabled = msg
 
-    def velocity_actual_cb(self, message):
-        self.v_actual, self.omega_actual = unpack_twist_message(message)
+    def twist_cb(self, msg):
+        self.linear_velocity = msg.twist.linear.x
+        self.angular_vel = msg.twist.angular.z
 
-    def twist_cmd_cb(self, message):
-        self.v_target, self.omega_target = unpack_twist_message(message)
+    def velocity_cb(self, msg):
+        self.current_vel = msg.twist.linear.x
 
 
 if __name__ == '__main__':
