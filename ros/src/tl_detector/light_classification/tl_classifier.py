@@ -5,21 +5,23 @@ import sys
 import tensorflow as tf
 from collections import defaultdict
 from io import StringIO
-from utils import label_map_util
-from utils import visualization_utils as vis_util
+from light_classification.label_map_util import *
+from light_classification.visualization_utils import *
 import time
 
 class TLClassifier(object):
     def __init__(self):
         self.current_light = TrafficLight.UNKNOWN
-        PATH_TO_LABELS = 'final/sdc_label_map.pbtxt'
-        GRAPH_FILE = 'final/frozen_inference_graph.pb'
+        # set path
+        cwd = os.path.dirname(os.path.realpath(__file__))
+        PATH_TO_LABELS = cwd + '/final/sdc_label_map.pbtxt'
+        GRAPH_FILE = cwd + '/final/frozen_inference_graph.pb'
         # only 4 classes are specified
         NUM_CLASSES = 4
-        label_map = label_map_util.load_labelmap(PATH_TO_LABELS)
-        categories = label_map_util.convert_label_map_to_categories(label_map,
+        label_map = load_labelmap(PATH_TO_LABELS)
+        categories = convert_label_map_to_categories(label_map,
             max_num_classes=NUM_CLASSES, use_display_name=True)
-        self.category_index = label_map_util.create_category_index(categories)
+        self.category_index = create_category_index(categories)
         # initialize
         self.detection_graph = tf.Graph()
         # https://github.com/tensorflow/tensorflow/issues/6698
@@ -29,7 +31,7 @@ class TLClassifier(object):
             graph_def = tf.GraphDef()
             with tf.gfile.GFile(GRAPH_FILE, 'rb') as fid:
                 serialized_graph = fid.read()
-                od_graph_def.ParseFromString(serialized_graph)
+                graph_def.ParseFromString(serialized_graph)
                 tf.import_graph_def(graph_def, name='')
             self.sess = tf.Session(graph=self.detection_graph, config=config)
         # Definite input and output Tensors for detection_graph
@@ -66,26 +68,26 @@ class TLClassifier(object):
         classes = np.squeeze(classes).astype(np.int32)
         # set a threshold
         min_score_thresh = .50
-            for i in range(boxes.shape[0]):
-                if scores is None or scores[i] > min_score_thresh:
-                    class_name = self.category_index[classes[i]]['name']
-                    if class_name == 'Red':
-                        self.current_light = TrafficLight.RED
-                    elif class_name == 'Green':
-                        self.current_light = TrafficLight.GREEN
-                    elif class_name == 'Yellow':
-                        self.current_light = TrafficLight.YELLOW
-                    # get distance to traffic light
-                    perceived_width_x = (boxes[i][3] - boxes[i][1]) * 800
-                    perceived_width_y = (boxes[i][2] - boxes[i][0]) * 600
-                    # traffic light is 3 feet long and 1 foot wide
-                    fx =  1345.200806
-                    fy =  1353.838257
-                    perceived_depth_x = ((1 * fx) / perceived_width_x)
-                    perceived_depth_y = ((3 * fy) / perceived_width_y )
-                    estimated_distance = round((perceived_depth_x + perceived_depth_y) / 2)
+        for i in range(boxes.shape[0]):
+            if scores is None or scores[i] > min_score_thresh:
+                class_name = self.category_index[classes[i]]['name']
+                if class_name == 'Red':
+                    self.current_light = TrafficLight.RED
+                elif class_name == 'Green':
+                    self.current_light = TrafficLight.GREEN
+                elif class_name == 'Yellow':
+                    self.current_light = TrafficLight.YELLOW
+                # get distance to traffic light
+                perceived_width_x = (boxes[i][3] - boxes[i][1]) * 800
+                perceived_width_y = (boxes[i][2] - boxes[i][0]) * 600
+                # traffic light is 3 feet long and 1 foot wide
+                fx =  1345.200806
+                fy =  1353.838257
+                perceived_depth_x = ((1 * fx) / perceived_width_x)
+                perceived_depth_y = ((3 * fy) / perceived_width_y )
+                estimated_distance = round((perceived_depth_x + perceived_depth_y) / 2)
         # Visualization of the results of a detection.
-        vis_util.visualize_boxes_and_labels_on_image_array(
+        visualize_boxes_and_labels_on_image_array(
             image, boxes, classes, scores,
             self.category_index,
             use_normalized_coordinates=True,
