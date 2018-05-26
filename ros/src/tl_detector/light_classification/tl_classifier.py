@@ -9,6 +9,7 @@ from light_classification.label_map_util import *
 from light_classification.visualization_utils import *
 import time
 
+
 class TLClassifier(object):
     def __init__(self):
         self.current_light = TrafficLight.UNKNOWN
@@ -56,6 +57,7 @@ class TLClassifier(object):
             int: ID of traffic light color (specified in styx_msgs/TrafficLight)
 
         """
+        rospy.logdebug("tl_classifier: Classification requested")
         image_np_expanded = np.expand_dims(image, axis=0)
         #  detection.
         with self.detection_graph.as_default():
@@ -73,6 +75,7 @@ class TLClassifier(object):
                 class_name = self.category_index[classes[i]]['name']
                 if class_name == 'Red':
                     self.current_light = TrafficLight.RED
+                    rospy.logdebug("tl_classifier: RED light detected") 
                 elif class_name == 'Green':
                     self.current_light = TrafficLight.GREEN
                 elif class_name == 'Yellow':
