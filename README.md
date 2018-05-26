@@ -61,6 +61,18 @@ roslaunch launch/styx.launch
 ```
 4. Run the simulator
 
+#### upgrade pillow
+
+If receiving the error below:
+```
+File "/capstone/ros/src/styx/bridge.py", line 180, in publish_camera
+image_message = self.bridge.cv2_to_imgmsg(image_array, encoding="rgb8")
+File "/opt/ros/kinetic/lib/python2.7/dist-packages/cv_bridge/core.py", line 248, in cv2_to_imgmsg
+img_msg.height = cvim.shape[0]
+IndexError: tuple index out of range
+```
+Can be solved with `pip install pillow --upgrade` inside the docker container.
+
 ### Real world testing
 1. Download [training bag](https://s3-us-west-1.amazonaws.com/udacity-selfdrivingcar/traffic_light_bag_file.zip) that was recorded on the Udacity self-driving car.
 2. Unzip the file
