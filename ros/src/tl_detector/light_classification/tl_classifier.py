@@ -1,4 +1,5 @@
 from styx_msgs.msg import TrafficLight
+import rospy
 import numpy as np
 import os
 import sys
@@ -75,7 +76,7 @@ class TLClassifier(object):
                 class_name = self.category_index[classes[i]]['name']
                 if class_name == 'Red':
                     self.current_light = TrafficLight.RED
-                    rospy.logdebug("tl_classifier: RED light detected") 
+                    rospy.logdebug("tl_classifier: RED light detected")
                 elif class_name == 'Green':
                     self.current_light = TrafficLight.GREEN
                 elif class_name == 'Yellow':
