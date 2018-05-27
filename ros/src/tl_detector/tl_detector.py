@@ -49,7 +49,7 @@ class TLDetector(object):
 
         self.bridge = CvBridge()
         self.light_classifier = TLClassifier()
-        print("Traffic Classifier is ready!")
+        rospy.loginfo("Traffic Classifier is ready!")
         self.listener = tf.TransformListener()
 
         self.state = TrafficLight.UNKNOWN
@@ -143,9 +143,7 @@ class TLDetector(object):
         if (not self.has_image):
             self.prev_light_loc = None
             return False
-
         cv_image = self.bridge.imgmsg_to_cv2(self.camera_image, "bgr8")
-
         # Get classification
         return self.light_classifier.get_classification(cv_image)
 
@@ -160,7 +158,6 @@ class TLDetector(object):
         """
         closest_light = None
         line_wp_idx = None
-
         # List of positions that correspond to the line to stop in front of for
         # a given intersection
         stop_line_positions = self.config['stop_line_positions']
@@ -179,7 +176,7 @@ class TLDetector(object):
                     line_wp_idx = temp_wp_idx
         if closest_light:
             state = self.get_light_state(closest_light)
-            rospy.logdebug("current light is: ", state)
+            rospy.logwarn("current light is: ", state)
             return line_wp_idx, state
         return -1, TrafficLight.UNKNOWN
 

@@ -198,7 +198,7 @@ class WaypointUpdater(object):
             full_speed = np.ones(7*LOOKAHEAD_WPS//8) * MAX_SPEED
             speeds = np.concatenate((speeds, full_speed))
 
-        rospy.logwarn("wp_updater: published speed: {}".format(speeds))
+        rospy.logdebug("wp_updater: published speed: {}".format(speeds))
 
         lookahead = LOOKAHEAD_WPS if len(lane.waypoints) > LOOKAHEAD_WPS else len(lane.waypoints)
         for i in xrange(lookahead):

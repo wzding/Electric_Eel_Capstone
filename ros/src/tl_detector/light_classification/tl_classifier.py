@@ -45,7 +45,7 @@ class TLClassifier(object):
         self.detection_scores = self.detection_graph.get_tensor_by_name('detection_scores:0')
         self.detection_classes = self.detection_graph.get_tensor_by_name('detection_classes:0')
         self.num_detections = self.detection_graph.get_tensor_by_name('num_detections:0')
-        print("Loaded graph")
+        rospy.loginfo("Loaded graph")
 
 
     def get_classification(self, image):
@@ -76,11 +76,13 @@ class TLClassifier(object):
                 class_name = self.category_index[classes[i]]['name']
                 if class_name == 'Red':
                     self.current_light = TrafficLight.RED
-                    rospy.logdebug("tl_classifier: RED light detected")
+                    rospy.loginfo("tl_classifier: Red light detected")
                 elif class_name == 'Green':
                     self.current_light = TrafficLight.GREEN
+                    rospy.loginfo("tl_classifier: Green light detected")
                 elif class_name == 'Yellow':
                     self.current_light = TrafficLight.YELLOW
+                    rospy.loginfo("tl_classifier: Yellow light detected")
                 # get distance to traffic light
                 perceived_width_x = (boxes[i][3] - boxes[i][1]) * 800
                 perceived_width_y = (boxes[i][2] - boxes[i][0]) * 600
