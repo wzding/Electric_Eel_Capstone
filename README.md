@@ -74,10 +74,7 @@ roslaunch launch/styx.launch
 ```
 4. Run the simulator
 
-In a new terminal window on your host machine, start a second bash while the Docker image is still running:
-```
-docker exec -it capstone bash
-```
+In a new terminal window on your host machine, start a second bash while the Docker image is still running: use `docker container ls` to get the container ID, then `docker exec -it 0bcb02eb6b91 bash` assuming 0bcb02eb6b91 is the ID.
 
 ### Real world testing 
 **Can only be used for the first two installation options. It will not work within a Docker image.**
