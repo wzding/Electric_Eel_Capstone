@@ -1,4 +1,6 @@
-1. Native Installation
+This file contains solutions to variable issues you might encounter during installation phase. 
+
+## 1. Native Installation
 
 Note that ROS only works on Linux. You will need to install Ubuntu 16.04 if you want a native installation, or use the provided Docker file to run a preconfigured ROS installation on Ubuntu 16.04 inside a virtual machine on your Mac or Windows host.
 
@@ -18,7 +20,7 @@ echo "source /opt/ros/kinetic/setup.bash" >> ~/.bashrc
 source ~/.bashrc
 ```
 
-2. Using Virtual Machine
+## 2. Using Virtual Machine
 
 ### Issue 1: received `socket.timeout: timed out` error even after setting port forwarding.
 
@@ -29,7 +31,7 @@ lsof -i | grep 4567
 ```
 [Here's a reference of this issue](https://discussions.udacity.com/t/ros-and-simulator-communication-socket-error/381345)
 
-3. Docker Installation
+## 3. Docker Installation
 
 ### Issue 1: received  `cannot connect to X server` error when running rviz in Docker container.
 
