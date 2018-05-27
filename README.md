@@ -1,4 +1,4 @@
-This is the project repo for the final project of the Udacity Self-Driving Car Nanodegree: Programming a Real Self-Driving Car. For more information about the project, see the project introduction [here](https://classroom.udacity.com/nanodegrees/nd013/parts/6047fe34-d93c-4f50-8336-b70ef10cb4b2/modules/e1a23b06-329a-4684-a717-ad476f0d8dff/lessons/462c933d-9f24-42d3-8bdc-a08a5fc866e4/concepts/5ab4b122-83e6-436d-850f-9f4d26627fd9).
+This is the project repo for the final project of the Udacity Self-Driving Car Nanodegree: Programming a Real Self-Driving Car. For more information about the project, see the project introduction [here](https://classroom.udacity.com/nanodegrees/nd013/parts/6047fe34-d93c-4f50-8336-b70ef10cb4b2/modules/e1a23b06-329a-4684-a717-ad476f0d8dff/lessons/462c933d-9f24-42d3-8bdc-a08a5fc866e4/concepts/5ab4b122-83e6-436d-850f-9f4d26627fd9). If you face any installation issues, you might find [this instruction](https://github.com/wzding/Electric_Eel_Capstone/blob/master/installation_issues.md) useful to help you solve the issues.
 
 Please use **one** of the three installation options.
 
@@ -46,6 +46,12 @@ source devel/setup.sh
 roslaunch launch/styx.launch
 ```
 4. Download the [Udacity Simulator](https://github.com/udacity/CarND-Capstone/releases) and run the simulator
+
+To open Udacity Simulator in Ubuntu:
+```
+chmod +x ./sys_int.x86_64
+./sys_int.x86_64
+```
 
 ### 3. Docker Installation
 [Install Docker](https://docs.docker.com/engine/installation/)
