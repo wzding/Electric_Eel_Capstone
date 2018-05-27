@@ -1,3 +1,6 @@
+.DS_Store
+ros/src/styx_msgs/.DS_Store
+ros/src/tl_detector/light_classification/final/frozen_inference_graph.pb
 data/.DS_Store
 ros/.DS_Store
 ros/src/.DS_Store
