@@ -33,7 +33,17 @@ lsof -i | grep 4567
 
 ## 3. Docker Installation
 
-#### Issue 1: received  `cannot connect to X server` error when running rviz in Docker container.
+#### Issue 1: if receiving the error below:
+```
+File "/capstone/ros/src/styx/bridge.py", line 180, in publish_camera
+image_message = self.bridge.cv2_to_imgmsg(image_array, encoding="rgb8")
+File "/opt/ros/kinetic/lib/python2.7/dist-packages/cv_bridge/core.py", line 248, in cv2_to_imgmsg
+img_msg.height = cvim.shape[0]
+IndexError: tuple index out of range
+```
+Can be solved with `pip install pillow --upgrade` inside the docker container.
+
+#### Issue 2: received  `cannot connect to X server` error when running rviz in Docker container.
 
 Can be potentially solved using instructions [here](
 http://wiki.ros.org/docker/Tutorials/GUI). But we suggest to NOT use rviz in docker container.
