@@ -26,7 +26,7 @@ The Udacity provided virtual machine has ROS and Dataspeed DBW already installed
 * Click on the green plus, adds new port forwarding rule.
 * Add a rule that assigns 4567 as both the host port and guest Port, as in the screenshot.
 
-![alt text][./imgs/port-forward.png]
+![alt text](./imgs/port-forward.png)
 
 ### The rest of steps to run the project if you choose one of the first two options.
 1. Clone the project repository
@@ -95,10 +95,10 @@ roslaunch launch/site.launch
 ```bash
 rosbag play -l traffic_light_bag_file/traffic_light_training.bag
 ```
-5. Open one more terminal and run rviz using with [this configure file]()
+5. Open one more terminal and run rviz using with [this configure file](https://github.com/wzding/Electric_Eel_Capstone/blob/master/script/default.rviz)
 ```bash
 rosrun rviz rviz -d script/default.rviz
 ```
 6. You'll be able to see visualization like this:
 
-![alt text][./imgs/autoware_computing.gif]
+![alt text](./imgs/autoware_computing.gif)
