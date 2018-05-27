@@ -61,42 +61,45 @@ class TLClassifier(object):
         rospy.logdebug("tl_classifier: Classification requested")
         image_np_expanded = np.expand_dims(image, axis=0)
         #  detection.
-        with self.detection_graph.as_default():
-            (boxes, scores, classes, num) = self.sess.run(
-                [self.detection_boxes, self.detection_scores,
-                self.detection_classes, self.num_detections],
-                feed_dict={self.image_tensor: image_np_expanded})
+        (boxes, scores, classes, num) = self.sess.run(
+            [self.detection_boxes, self.detection_scores,
+            self.detection_classes, self.num_detections],
+            feed_dict={self.image_tensor: image_np_expanded})
         boxes = np.squeeze(boxes)
         scores = np.squeeze(scores)
         classes = np.squeeze(classes).astype(np.int32)
         # set a threshold
-        min_score_thresh = .50
-        for i in range(boxes.shape[0]):
-            if scores is None or scores[i] > min_score_thresh:
-                class_name = self.category_index[classes[i]]['name']
-                if class_name == 'Red':
-                    self.current_light = TrafficLight.RED
-                    rospy.loginfo("tl_classifier: Red light detected")
-                elif class_name == 'Green':
-                    self.current_light = TrafficLight.GREEN
-                    rospy.loginfo("tl_classifier: Green light detected")
-                elif class_name == 'Yellow':
-                    self.current_light = TrafficLight.YELLOW
-                    rospy.loginfo("tl_classifier: Yellow light detected")
-                # get distance to traffic light
-                perceived_width_x = (boxes[i][3] - boxes[i][1]) * 800
-                perceived_width_y = (boxes[i][2] - boxes[i][0]) * 600
-                # traffic light is 3 feet long and 1 foot wide
-                fx =  1345.200806
-                fy =  1353.838257
-                perceived_depth_x = ((1 * fx) / perceived_width_x)
-                perceived_depth_y = ((3 * fy) / perceived_width_y )
-                estimated_distance = round((perceived_depth_x + perceived_depth_y) / 2)
-        # Visualization of the results of a detection.
-        visualize_boxes_and_labels_on_image_array(
-            image, boxes, classes, scores,
-            self.category_index,
-            use_normalized_coordinates=True,
-            line_thickness=8)
+        min_score_thresh = .60
+        rospy.loginfo("classes are: {}".format(classes))
+        # for i in range(boxes.shape[0]):
+        if scores[0] > min_score_thresh:
+            # score[0] always has the highest score
+            class_name = self.category_index[classes[0]]['name']
+            if class_name == 'Red':
+                self.current_light = TrafficLight.RED
+                rospy.loginfo("tl_classifier: Red light detected")
+            elif class_name == 'Green':
+                self.current_light = TrafficLight.GREEN
+                rospy.loginfo("tl_classifier: Green light detected")
+            elif class_name == 'Yellow':
+                self.current_light = TrafficLight.YELLOW
+                rospy.loginfo("tl_classifier: Yellow light detected")
+            else:
+                self.current_light = TrafficLight.UNKNOWN
+            # # get distance to traffic light
+            # perceived_width_x = (boxes[i][3] - boxes[i][1]) * 800
+            # perceived_width_y = (boxes[i][2] - boxes[i][0]) * 600
+            # # traffic light is 3 feet long and 1 foot wide
+            # fx =  1345.200806
+            # fy =  1353.838257
+            # perceived_depth_x = ((1 * fx) / perceived_width_x)
+            # perceived_depth_y = ((3 * fy) / perceived_width_y )
+            # estimated_distance = round((perceived_depth_x + perceived_depth_y) / 2)
+        # # Visualization of the results of a detection.
+        # visualize_boxes_and_labels_on_image_array(
+        #     image, boxes, classes, scores,
+        #     self.category_index,
+        #     use_normalized_coordinates=True,
+        #     line_thickness=8)
         self.image_np_deep = image
         return self.current_light
