@@ -79,13 +79,23 @@ Can be solved with `pip install pillow --upgrade` inside the docker container.
 ```bash
 unzip traffic_light_bag_file.zip
 ```
-3. Play the bag file
+3. Open a terminal and start 
 ```bash
+source devel/setup.sh
+roscore
+```
+4. Open another terminal, play the bag file
+```bash
+source devel/setup.sh
 rosbag play -l traffic_light_bag_file/traffic_light_training.bag
 ```
-4. Launch your project in site mode
+5. Open one more terminal and run 
 ```bash
-cd CarND-Capstone/ros
+source devel/setup.sh
+rviz
+```
+6. Launch the project in site mode
+```bash
 roslaunch launch/site.launch
 ```
-5. Confirm that traffic light detection works on real life images
+7. Confirm that traffic light detection works on real life images
