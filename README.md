@@ -74,17 +74,10 @@ roslaunch launch/styx.launch
 ```
 4. Run the simulator
 
-#### upgrade pillow
-
-If receiving the error below:
+In a new terminal window on your host machine, start a second bash while the Docker image is still running:
 ```
-File "/capstone/ros/src/styx/bridge.py", line 180, in publish_camera
-image_message = self.bridge.cv2_to_imgmsg(image_array, encoding="rgb8")
-File "/opt/ros/kinetic/lib/python2.7/dist-packages/cv_bridge/core.py", line 248, in cv2_to_imgmsg
-img_msg.height = cvim.shape[0]
-IndexError: tuple index out of range
+docker exec -it capstone bash
 ```
-Can be solved with `pip install pillow --upgrade` inside the docker container.
 
 ### Real world testing 
 **Can only be used for the first two installation options. It will not work within a Docker image.**
