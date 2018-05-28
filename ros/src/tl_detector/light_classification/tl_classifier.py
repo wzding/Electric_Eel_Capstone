@@ -58,7 +58,7 @@ class TLClassifier(object):
             int: ID of traffic light color (specified in styx_msgs/TrafficLight)
 
         """
-        rospy.logdebug("tl_classifier: Classification requested")
+        rospy.loginfo("tl_classifier: Classification requested")
         image_np_expanded = np.expand_dims(image, axis=0)
         #  detection.
         (boxes, scores, classes, num) = self.sess.run(
@@ -70,8 +70,7 @@ class TLClassifier(object):
         classes = np.squeeze(classes).astype(np.int32)
         # set a threshold
         min_score_thresh = .60
-        rospy.loginfo("classes are: {}".format(classes))
-        # for i in range(boxes.shape[0]):
+        # rospy.loginfo("classes are: {}".format(classes))
         if scores[0] > min_score_thresh:
             # score[0] always has the highest score
             class_name = self.category_index[classes[0]]['name']
@@ -95,11 +94,11 @@ class TLClassifier(object):
             # perceived_depth_x = ((1 * fx) / perceived_width_x)
             # perceived_depth_y = ((3 * fy) / perceived_width_y )
             # estimated_distance = round((perceived_depth_x + perceived_depth_y) / 2)
-        # # Visualization of the results of a detection.
-        # visualize_boxes_and_labels_on_image_array(
-        #     image, boxes, classes, scores,
-        #     self.category_index,
-        #     use_normalized_coordinates=True,
-        #     line_thickness=8)
+        # Visualization of the results of a detection.
+        visualize_boxes_and_labels_on_image_array(
+            image, boxes, classes, scores,
+            self.category_index,
+            use_normalized_coordinates=True,
+            line_thickness=8)
         self.image_np_deep = image
         return self.current_light
