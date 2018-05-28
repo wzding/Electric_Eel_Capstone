@@ -1,18 +1,17 @@
 """
-This is a collection of helper functions for computing
-Cross Track Error (CTE).
+This is a collection of helper functions for computing Cross Track Error (CTE).
 """
 
 import math
 import numpy as np
-
 from tf.transformations import euler_from_quaternion
 
 # How many waypoints to use to fit polynomial
 WAYPOINTS_LOOKAHEAD = 20
 
 def compute_cte(waypoints, pose):
-    """ Calculates CTE of given pose using waypoints as guide
+    """
+    Calculates CTE of given pose using waypoints as guide
     """
     coords_x, coords_y = get_points_wrt_pose(waypoints[:WAYPOINTS_LOOKAHEAD], pose)
     fit = np.poly1d(np.polyfit(coords_x, coords_y, 2))
