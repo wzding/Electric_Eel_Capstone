@@ -30,16 +30,13 @@ from std_msgs.msg import Bool
 from dbw_mkz_msgs.msg import ThrottleCmd, SteeringCmd, BrakeCmd, SteeringReport
 from geometry_msgs.msg import TwistStamped, PoseStamped
 from styx_msgs.msg import Lane
-
 from twist_controller import Controller
-from dbw_cte import compute_cte
+from helper import compute_cte
 
 # Dont publish if last published values don't differ above corresponding EPSILON
 STEERING_EPSILON = 0.1
 THROTTLE_EPSILON = 0.05
 BRAKE_EPSILON = 0.05
-
-SUBSCRIBER_QUEUE_SIZE = 1
 
 class DBWNode(object):
     """
@@ -62,14 +59,12 @@ class DBWNode(object):
         steer_ratio = rospy.get_param('~steer_ratio', 14.8)
         max_lat_accel = rospy.get_param('~max_lat_accel', 3.)
         max_steer_angle = rospy.get_param('~max_steer_angle', 8.)
-
         max_throttle_pct = rospy.get_param('~max_throttle_percentage', 1.)
         rospy.logwarn("dbw_node: max throttle pct: %f", max_throttle_pct)
         max_braking_pct = rospy.get_param('~max_braking_percentage', -1.)
         rospy.logwarn("dbw_node: max braking pct: %f", max_braking_pct)
 
         self.lock = threading.Lock()
-
         self.dbw_enabled = False
         self.last_throttle = 2*THROTTLE_EPSILON
         self.last_brake = 2*BRAKE_EPSILON
@@ -86,7 +81,6 @@ class DBWNode(object):
                                             ThrottleCmd, queue_size=1)
         self.brake_pub = rospy.Publisher('/vehicle/brake_cmd',
                                          BrakeCmd, queue_size=1)
-
         self.controller = Controller(vehicle_mass,
                                      fuel_capacity,
                                      brake_deadband,
@@ -103,27 +97,27 @@ class DBWNode(object):
         rospy.Subscriber('/current_velocity',
                          TwistStamped,
                          self.current_velocity_cb,
-                         queue_size=SUBSCRIBER_QUEUE_SIZE)
+                         queue_size=1)
 
         rospy.Subscriber('/twist_cmd',
                          TwistStamped,
                          self.twist_cmd_cb,
-                         queue_size=SUBSCRIBER_QUEUE_SIZE)
+                         queue_size=1)
 
         rospy.Subscriber('/vehicle/dbw_enabled',
                          Bool,
                          self.dbw_enabled_cb,
-                         queue_size=SUBSCRIBER_QUEUE_SIZE)
+                         queue_size=1)
 
         rospy.Subscriber('/current_pose',
                          PoseStamped,
                          self.current_pose_cb,
-                         queue_size=SUBSCRIBER_QUEUE_SIZE)
+                         queue_size=1)
 
         rospy.Subscriber('/final_waypoints',
                          Lane,
                          self.waypoints_cb,
-                         queue_size=SUBSCRIBER_QUEUE_SIZE)
+                         queue_size=1)
 
         self.loop()
 
@@ -131,12 +125,11 @@ class DBWNode(object):
         """Loop that computes throttle, brake and steer to publish."""
         rate = rospy.Rate(50)
         while not rospy.is_shutdown():
-
-            if self._valid_state():
+            if all([self.proposed_velocities, self.current_velocity, self.current_pose, self.waypoints]):
                 with self.lock:
                     is_activated = self.activated
+                    # Calculates CTE of given pose using waypoints
                     cte = compute_cte(self.waypoints, self.current_pose)
-
                 throttle, brake, steer = self.controller.control(is_activated,
                                                                  cte,
                                                                  self.proposed_velocities.twist.linear.x,
@@ -145,8 +138,8 @@ class DBWNode(object):
                 if is_activated:
                     rospy.logdebug("%f, %f, %f", throttle, brake, steer)
                     self.publish(throttle, brake, steer)
-
             rate.sleep()
+
 
     def publish(self, throttle, brake, steer):
         """Publish throttle, brake and steer."""
@@ -166,7 +159,7 @@ class DBWNode(object):
             self.steer_pub.publish(scmd)
         else:
             rospy.logdebug("not publish steer: %f", abs(steer - self.last_steer))
-            
+
         if abs(brake - self.last_brake) < BRAKE_EPSILON:
             bcmd = BrakeCmd()
             bcmd.enable = True
@@ -180,11 +173,14 @@ class DBWNode(object):
         self.last_brake = brake
         self.last_steer = steer
 
+
     def current_velocity_cb(self, msg):
         self.current_velocity = msg
 
+
     def twist_cmd_cb(self, msg):
         self.proposed_velocities = msg
+
 
     def dbw_enabled_cb(self, msg):
         if (self.activated != msg.data):
@@ -194,20 +190,15 @@ class DBWNode(object):
 
         self.activated = msg.data
 
+
     def current_pose_cb(self, msg):
         with self.lock:
             self.current_pose = msg.pose
 
+
     def waypoints_cb(self, msg):
         with self.lock:
             self.waypoints = msg.waypoints
-
-    def _valid_state(self):
-        """ Checks whether node has all information needed to operate correctly.
-        This node needs: Proposed and current velocity, current position and waypoints to follow.
-        """
-        return self.proposed_velocities is not None and self.current_velocity is not None and \
-            self.current_pose is not None and self.waypoints is not None
 
 
 if __name__ == '__main__':
