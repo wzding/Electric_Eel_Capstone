@@ -22,7 +22,9 @@ from geometry_msgs.msg import TwistStamped
 from styx_msgs.msg import Lane
 from helper import is_waypoint_behind_pose
 
-MAX_SPEED = 10 # replace with the configurable one
+
+LOOKAHEAD_WPS = 200 #Number of waypoints we will publish
+MAX_SPEED = 10
 lambda_fct = lambda a, b: math.sqrt((a.x-b.x)**2 + (a.y-b.y)**2  + (a.z-b.z)**2)
 
 class WaypointUpdater(object):
@@ -30,8 +32,6 @@ class WaypointUpdater(object):
 
     def __init__(self):
         rospy.init_node('waypoint_updater')
-        # Number of waypoints we will publish
-        LOOKAHEAD_WPS = rospy.get_param('lookahead_wps', 200)
         rospy.Subscriber('/current_pose', PoseStamped, self.pose_cb)
         rospy.Subscriber('/base_waypoints', Lane, self.waypoints_cb)
         rospy.Subscriber('/traffic_waypoint', Int32, self.traffic_cb)
