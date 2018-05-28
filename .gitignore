@@ -1,3 +1,4 @@
+ros/src/styx/data/.gitattributes
 ros/build/
 ros/devel/
 ros/src/styx/bridge.pyc
