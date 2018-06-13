@@ -25,7 +25,6 @@ parser = argparse.ArgumentParser(description='Traffic Light CSV to TFRecord file
 parser.add_argument('--input_file', type=str, default='data/loop_with_traffic_light.csv', help='traffic light csv input file')
 parser.add_argument('--output_file', type=str, default='data/tl_train.record', help='TFRecord file')
 parser.add_argument('--label_map', type=str, default='data/mscoco_label_map.pbtxt', help='label map file')
-parser.add_argument('--new_label_map', type=str, default='data/sdc_label_map.pbtxt', help='label map file')
 parser.add_argument('--model_dir', type=str, default='models/faster_rcnn_inception_resnet_v2_atrous_coco_2018_01_28', help='model directory')
 args = parser.parse_args()
 MODEL_DIR = args.model_dir
@@ -34,7 +33,6 @@ MODEL_DIR = args.model_dir
 PATH_TO_CKPT = MODEL_DIR + '/frozen_inference_graph.pb'
 # List of the strings that is used to add correct label for each box.
 LABEL_MAP = args.label_map
-NEW_LABEL = args.new_label_map
 INPUT_FILE = args.input_file
 OUTPUT_FILE = args.output_file
 # incsv = os.getcwd()+'data/'+ args.infilename
